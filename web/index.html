@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Template</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ESP32 Project Template</h1>
+            <p class="subtitle">Vite + PlatformIO Template</p>
+        </header>
+
+        <main>
+            <section class="card">
+                <h2>Status</h2>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="label">Connection:</span>
+                        <span id="connection-status" class="value">Connecting...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Uptime:</span>
+                        <span id="uptime" class="value">--</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Controls</h2>
+                <div class="controls">
+                    <button id="action-btn" class="btn btn-primary">Test Action</button>
+                    <button id="refresh-btn" class="btn btn-secondary">Refresh</button>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Info</h2>
+                <p>This is a template project combining:</p>
+                <ul>
+                    <li>Vite for modern web development</li>
+                    <li>PlatformIO for ESP32 firmware</li>
+                    <li>Build scripts for deployment</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <p>Template Project &copy; 2025</p>
+        </footer>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>

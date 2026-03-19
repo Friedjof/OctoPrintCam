@@ -1,0 +1,16 @@
+{
+  "name": "pio-template-web",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Vite web interface template for ESP32 projects",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:esp": "vite build && python3 ../tools/web-to-header.py dist -o ../lib/WebService",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "terser": "^5.44.1",
+    "vite": "^5.0.0"
+  }
+}
