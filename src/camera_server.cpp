@@ -28,8 +28,7 @@
 
 #define CAMERA_PORT 81
 
-// Mutex that serialises sensor reconfiguration for high-quality snapshots.
-// Only snapshot tasks take this; stream tasks run freely without it.
+// Serialises concurrent snapshot requests.
 static SemaphoreHandle_t s_cam_mutex = nullptr;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -82,7 +81,13 @@ static void clientTask(void *arg) {
 
         char partHdr[64];
         while (true) {
+            // Take the mutex only for fb_get so the snapshot task can pause
+            // the stream at a safe point (no buffer held) when it needs
+            // exclusive access to the camera.
+            xSemaphoreTake(s_cam_mutex, portMAX_DELAY);
             camera_fb_t *fb = esp_camera_fb_get();
+            xSemaphoreGive(s_cam_mutex);
+
             if (!fb) break;
 
             int hLen = snprintf(partHdr, sizeof(partHdr),
@@ -97,27 +102,22 @@ static void clientTask(void *arg) {
         }
 
     } else if (isSnapshot) {
-        // High-quality snapshot: keep VGA framesize to avoid destabilising the
-        // camera driver, but drop JPEG quality to 4 (near-lossless).
-        // The mutex prevents concurrent snapshot tasks from interfering.
+        // High-quality snapshot at quality 4 (near-lossless).
+        // The mutex pauses stream tasks at their fb_get so the camera is
+        // not contested. GRAB_LATEST applies quality changes on the very
+        // next frame, so one warm-up discard is enough.
         xSemaphoreTake(s_cam_mutex, portMAX_DELAY);
 
         bool hasPsram = psramFound();
         sensor_t *sensor = esp_camera_sensor_get();
         if (sensor) sensor->set_quality(sensor, 4);
 
-        // Flush all frame buffers so the quality change takes effect.
-        int flushed = 0;
-        TickType_t deadline = xTaskGetTickCount() + pdMS_TO_TICKS(2000);
-        while (flushed < 4 && xTaskGetTickCount() < deadline) {
-            camera_fb_t *f = esp_camera_fb_get();
-            if (f) { esp_camera_fb_return(f); flushed++; }
-            else    vTaskDelay(pdMS_TO_TICKS(50));
-        }
+        // Discard the frame that was already in flight at quality 15.
+        camera_fb_t *warm = esp_camera_fb_get();
+        if (warm) esp_camera_fb_return(warm);
 
         camera_fb_t *fb = esp_camera_fb_get();
 
-        // Restore stream quality immediately.
         if (sensor) sensor->set_quality(sensor, hasPsram ? 15 : 20);
 
         xSemaphoreGive(s_cam_mutex);

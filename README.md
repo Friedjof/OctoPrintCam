@@ -1,5 +1,7 @@
 # OctoPrintCam
 
+> **Experimental** — This project is functional but not yet fully tested. In particular, **pan/tilt servo control has not been tested on hardware** and may require adjustments. Use at your own risk and expect rough edges.
+
 ESP32-CAM firmware with pan/tilt servo control, MJPEG streaming, WebSocket control, and a REST API. Designed as a drop-in webcam for OctoPrint.
 
 ## Hardware
@@ -16,12 +18,12 @@ GPIO 16 must remain unused (PSRAM clock line).
 
 ## Features
 
-- MJPEG live stream on port 81
-- Single JPEG snapshot on port 81
+- MJPEG live stream at XGA (1024×768) on port 81
+- High-quality JPEG snapshot (near-lossless, quality 4) on port 81
 - WebSocket control (SUSCam-compatible protocol) on port 80
 - REST API for position, limits, light, and status on port 80
 - mDNS hostname: `octocam.local`
-- Pan/tilt servo control via WebSocket commands or REST
+- Pan/tilt servo control via WebSocket commands or REST *(untested on hardware)*
 - Automatic sensor tuning after camera init (BPC, WPC, lens correction)
 
 ## Configuration
@@ -57,10 +59,11 @@ After changing `sdkconfig.board` or `platformio.ini`, always run `make clean` be
 
 ### Port 81 — Camera server (native esp_http_server)
 
-| Method | Path        | Description              |
-|--------|-------------|--------------------------|
-| GET    | `/stream`   | MJPEG live stream        |
-| GET    | `/snapshot` | Single JPEG frame        |
+| Method | Path        | Description                                         |
+|--------|-------------|-----------------------------------------------------|
+| GET    | `/stream`   | MJPEG live stream (XGA, quality 15)                 |
+| GET    | `/snapshot` | Single JPEG frame (XGA, quality 4 — near-lossless) |
+| GET    | `/capture`  | Fast single frame, no warm-up (for timelapse)       |
 
 ### Port 80 — API server (ESPAsyncWebServer)
 
@@ -162,4 +165,4 @@ Two HTTP servers run concurrently:
 
 These two server libraries define `HTTP_GET` and related constants in incompatible enums. They must never be included in the same translation unit. This is why the camera server lives in its own `.cpp` file with no `ESPAsyncWebServer` include.
 
-With PSRAM the camera runs at VGA (640×480) with 3 frame buffers and JPEG quality 15. Without PSRAM it falls back to QVGA, 1 frame buffer, and quality 20.
+With PSRAM the camera runs at XGA (1024×768) with 3 frame buffers and JPEG quality 15 for streaming. Snapshots temporarily switch to quality 4 (near-lossless) while the stream is paused. Without PSRAM it falls back to QVGA, 1 frame buffer, and quality 20.

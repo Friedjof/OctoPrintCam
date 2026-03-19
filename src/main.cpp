@@ -104,7 +104,7 @@ bool initCamera() {
     cfg.grab_mode    = CAMERA_GRAB_LATEST;
 
     if (psramFound()) {
-        cfg.frame_size   = FRAMESIZE_VGA;
+        cfg.frame_size   = FRAMESIZE_XGA;
         cfg.jpeg_quality = 15;
         cfg.fb_count     = 3;
         cfg.fb_location  = CAMERA_FB_IN_PSRAM;
@@ -123,7 +123,7 @@ bool initCamera() {
 
     sensor_t *s = esp_camera_sensor_get();
     if (s) {
-        s->set_framesize(s, FRAMESIZE_VGA);
+        s->set_framesize(s, psramFound() ? FRAMESIZE_XGA : FRAMESIZE_QVGA);
         s->set_quality(s, psramFound() ? 15 : 20);
         s->set_gainceiling(s, GAINCEILING_4X);
         s->set_bpc(s, 1);
