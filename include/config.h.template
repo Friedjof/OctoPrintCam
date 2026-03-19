@@ -1,0 +1,46 @@
+#pragma once
+
+// ── WiFi ─────────────────────────────────────────────────────────────────────
+#define WIFI_SSID     "YOUR_WIFI_SSID"
+#define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
+
+// mDNS hostname → http://octocam.local
+#define MDNS_NAME "octocam"
+
+// ── AI Thinker ESP32-CAM – camera pins ───────────────────────────────────────
+#define PWDN_GPIO_NUM   32
+#define RESET_GPIO_NUM  -1
+#define XCLK_GPIO_NUM    0
+#define SIOD_GPIO_NUM   26
+#define SIOC_GPIO_NUM   27
+#define Y9_GPIO_NUM     35
+#define Y8_GPIO_NUM     34
+#define Y7_GPIO_NUM     39
+#define Y6_GPIO_NUM     36
+#define Y5_GPIO_NUM     21
+#define Y4_GPIO_NUM     19
+#define Y3_GPIO_NUM     18
+#define Y2_GPIO_NUM      5
+#define VSYNC_GPIO_NUM  25
+#define HREF_GPIO_NUM   23
+#define PCLK_GPIO_NUM   22
+
+// ── Servo pins (SD-card slot, unused) ────────────────────────────────────────
+// GPIO 12 and 13 are free when no SD card is inserted.
+#define SERVO_PAN_PIN   13   // Horizontal / X-axis
+#define SERVO_TILT_PIN  12   // Vertical   / Y-axis
+
+// ── Servo range ───────────────────────────────────────────────────────────────
+#define PAN_MIN    0
+#define PAN_MAX    180
+#define PAN_START  90
+
+#define TILT_MIN   0
+#define TILT_MAX   90
+#define TILT_START 45
+
+// Degrees moved per up/down/left/right command
+#define SERVO_STEP 5
+
+// ── Flash LED (AI Thinker onboard) ────────────────────────────────────────────
+#define FLASH_LED_PIN 4
